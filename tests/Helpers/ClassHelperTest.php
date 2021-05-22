@@ -115,4 +115,35 @@ class ClassHelperTest extends TestCase
 		self::assertSame(28, ClassHelper::getClassPointer($phpcsFile, $methodInBarPointer));
 	}
 
+	public function testGetClassPointersWithoutNamespace(): void
+	{
+		$phpcsFile = $this->getCodeSnifferFile(__DIR__ . '/data/propertyWithoutNamespace.php');
+
+		$fooClassPointer = $this->findClassPointerByName($phpcsFile, 'FooClass');
+		$fooPropertyPointer = $this->findPropertyPointerByName($phpcsFile, 'fooProperty');
+		self::assertSame([$fooPropertyPointer], ClassHelper::getPropertyPointers($phpcsFile, $fooClassPointer));
+	}
+
+	public function testGetClassPointersWithNamespace(): void
+	{
+		$phpcsFile = $this->getCodeSnifferFile(__DIR__ . '/data/propertyWithNamespace.php');
+
+		$fooClassPointer = $this->findClassPointerByName($phpcsFile, 'FooClass');
+		$fooPropertyPointer = $this->findPropertyPointerByName($phpcsFile, 'fooProperty');
+		self::assertSame([$fooPropertyPointer], ClassHelper::getPropertyPointers($phpcsFile, $fooClassPointer));
+	}
+
+	public function testGetClassPointersWithNestedProperty(): void
+	{
+		$phpcsFile = $this->getCodeSnifferFile(__DIR__ . '/data/classWithNestedProperty.php');
+
+		$fooClassPointer = $this->findClassPointerByName($phpcsFile, 'FooClass');
+		$fooPropertyPointer = $this->findPropertyPointerByName($phpcsFile, 'fooProperty');
+		self::assertSame([$fooPropertyPointer], ClassHelper::getPropertyPointers($phpcsFile, $fooClassPointer));
+
+		$anonymousClassPointer = $this->findPointerByLineAndType($phpcsFile, 9, T_ANON_CLASS);
+		$anonymousClassPropertyPointer = $this->findPropertyPointerByName($phpcsFile, 'anonymousClassProperty');
+		self::assertSame([$anonymousClassPropertyPointer], ClassHelper::getPropertyPointers($phpcsFile, $anonymousClassPointer));
+	}
+
 }
